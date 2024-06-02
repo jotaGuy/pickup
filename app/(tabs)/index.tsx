@@ -2,8 +2,25 @@ import { StyleSheet } from 'react-native';
 
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
+import { useEffect } from 'react';
 
 export default function TabOneScreen() {
+
+const connecting = async () => {
+  try {
+    const data = await fetch('http://localhost:8080/');
+    console.log("user: ", data.json().then(i => console.log("info: ", i)))
+  } catch(e) {
+    console.error(e);
+  }
+
+}
+
+useEffect(() => {
+  connecting();
+}, [])
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tab One</Text>
