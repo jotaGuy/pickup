@@ -1,35 +1,96 @@
-import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import { Platform, StyleSheet, TextInput, Button, TouchableOpacity } from "react-native";
+import { Formik } from "formik";
+import { Text, View } from "@/components/Themed";
 
 export default function ModalScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Modal</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/modal.tsx" />
-
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </View>
+    <Formik
+      initialValues={{
+        location: "",
+        playersConfirmed: "",
+        fullCourt: false,
+        playersNeeded: "",
+        createdTime: "",
+        updatedTime: "",
+      }}
+      onSubmit={(values) => {
+        fetch("http://localhost:8080/Listings", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        })
+          .then((response) => {
+            if (response.ok) {
+              console.log("Listing created successfully");
+            } else {
+              throw new Error("Failed to create listing");
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }}
+    >
+      {({ handleChange, handleBlur, handleSubmit, values }) => (
+        <View>
+          <TextInput
+            onChangeText={handleChange("location")}
+            onBlur={handleBlur("location")}
+            value={values.location}
+            placeholder="Location"
+          />
+          <TextInput
+            onChangeText={handleChange("playersConfirmed")}
+            onBlur={handleBlur("playersConfirmed")}
+            value={values.playersConfirmed}
+            placeholder="Players Confirmed"
+            keyboardType="numeric"
+          />
+          <TextInput
+            onChangeText={handleChange("playersNeeded")}
+            onBlur={handleBlur("playersNeeded")}
+            value={values.playersNeeded}
+            placeholder="Players Needed"
+            keyboardType="numeric"
+          />
+          <TextInput
+            onChangeText={handleChange("createdTime")}
+            onBlur={handleBlur("createdTime")}
+            value={values.createdTime}
+            placeholder="Created Time"
+            keyboardType="numeric"
+          />
+          <TextInput
+            onChangeText={handleChange("updatedTime")}
+            onBlur={handleBlur("updatedTime")}
+            value={values.updatedTime}
+            placeholder="Updated Time"
+            keyboardType="numeric"
+          />
+          <TouchableOpacity onPress={handleSubmit}>
+            <Text>Submit</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </Formik>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   separator: {
     marginVertical: 30,
     height: 1,
-    width: '80%',
+    width: "80%",
   },
 });
